@@ -139,7 +139,7 @@ runs:
 
     - name: Upload artifact with verification metadata
       id: upload
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: ${{ steps.generate-checksums.outputs.artifact-name }}
         path: ${{ inputs.path }}
@@ -149,6 +149,11 @@ runs:
         # Without this, directories like .audit/ or files like .gitignore are silently
         # excluded, causing "No files were found" errors even when files exist.
         include-hidden-files: true
+        # REQUIRED: upload ZIPPED. download-artifact-verified fetches artifacts through the
+        # REST .../artifacts/<id>/zip endpoint, so an unzipped upload (upload-artifact v7+
+        # with `archive: false`) would break every verified download. v7 defaults to true;
+        # set it explicitly so the dependency is visible (#96).
+        archive: true
 
     - name: Confirm upload completion
       shell: bash
